@@ -74,7 +74,7 @@ project environment.
 
 Then use your code (in the `src` directory) in a notebook with:
 
-```jupyter-notebook
+```python
 %load_ext autoreload
 %autoreload 2
 
@@ -89,12 +89,15 @@ from my_project.flux import compute_flux
 git init
 git add .
 git commit -m "Initial commit"
+git branch -M main
 
-gh repo create <repo_name> \
+gh repo create openghg/<repo_name> \
   --source=. \
   --remote=origin \
   --push
 ```
+
+Use a different org (or omit the org prefix) if you want a non-OpenGHG target.
 
 #### Fallback if GitHub CLI is not installed
 
@@ -203,7 +206,29 @@ This is the typical workflow:
 
 There are three common approaches.
 
-**Option A: bootstrap (fallback for HPC / existing kernels)**
+**Option A: editable install (preferred)**
+
+With `uv`, use:
+
+    uv sync
+
+or:
+
+    pip install -e .
+
+Use `pip install -e .` as a fallback for non-`uv` environments.
+
+Then import normally:
+
+    from my_project.flux import compute_flux
+
+Pros:
+- Clean imports
+- Closer to real package usage
+
+
+
+**Option B: bootstrap (fallback for HPC / existing kernels)**
 
 The preferred approach is to use `uv sync` (editable install) with autoreload.
 
@@ -226,28 +251,6 @@ Pros:
 - No environment changes
 - Works well on HPC
 - No kernel restart required
-
-
-
-**Option B: editable install**
-
-With `uv`, use:
-
-    uv sync
-
-or:
-
-    pip install -e .
-
-Use `pip install -e .` as a fallback for non-`uv` environments.
-
-Then import normally:
-
-    from my_project.flux import compute_flux
-
-Pros:
-- Clean imports
-- Closer to real package usage
 
 
 
@@ -326,3 +329,6 @@ For shared setup instructions (uv, gh, HPC workflows), consider maintaining a
 separate repository such as:
 
     openghg-tools
+
+TODO (@brendan-m-murphy): decide whether to create and maintain `openghg-tools`
+as the shared setup repository.
