@@ -1,0 +1,7 @@
+{
+  "repo_name": "my-openghg-project",
+  "package_name": "my_openghg_project",
+  "project_description": "Notebook-first OpenGHG/OpenGHG Inversions project",
+  "python_requires": ">=3.11",
+  "author_name": "Your Name"
+}
