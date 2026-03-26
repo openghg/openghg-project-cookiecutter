@@ -20,7 +20,7 @@ It creates a repo with:
 When you run the template, it will prompt you for some metadata:
 
 ```
-m13805$ uvx cookiecutter openghg-cookiecutter-template/
+ab12345$ uvx cookiecutter openghg-cookiecutter-template/
 Installed 21 packages in 111ms
   [1/5] repo_name (my-openghg-project): my-test-project
   [2/5] package_name (my_openghg_project): my_test_project
