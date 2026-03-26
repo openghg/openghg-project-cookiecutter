@@ -1,7 +1,9 @@
 # OpenGHG project cookiecutter
 
-A small cookiecutter template for notebook-first projects that depend on
-`openghg` and `openghg_inversions`, while still keeping reusable code in `src/`.
+A small cookiecutter template for projects that depend on
+`openghg` and `openghg_inversions`.
+
+The directory layout includes places for notebooks and data; this is meant to make it easier to manage experiments with notebooks.
 
 It creates a repo with:
 
@@ -14,6 +16,20 @@ It creates a repo with:
 - a kernel installation script for the project `.venv`
 
 ## Using the template
+
+When you run the template, it will prompt you for some metadata:
+
+```
+m13805$ uvx cookiecutter openghg-cookiecutter-template/
+Installed 21 packages in 111ms
+  [1/5] repo_name (my-openghg-project): my-test-project
+  [2/5] package_name (my_openghg_project): my_test_project
+  [3/5] project_description (Notebook-first OpenGHG/OpenGHG Inversions project): A test of the template.
+  [4/5] python_requires (>=3.11): 
+  [5/5] author_name (Your Name): Brendan Murphy
+```
+
+To run the template you have a few options.
 
 ### Preferred: `uvx`
 
@@ -38,9 +54,34 @@ python -m pip install cookiecutter
 cookiecutter /path/to/openghg-cookiecutter-template
 ```
 
+## Quickstart for notebooks
+
+From inside your project create an environment and install an ipython kernel:
+
+``` bash
+uv sync
+uv pip install -e .
+
+uv run python -m ipykernel install \
+  --user \
+  --name my-project \
+  --display-name "Python (my-project)"
+```
+
+Then use your code (in the `src` directory) in a notebook with:
+
+``` jupyter-notebook
+%load_ext autoreload
+%autoreload 2
+
+from my_project.flux import compute_flux
+```
+
+See below for more details.
+
 ## Examples
 
-### 1) Project with reusable inversions or forward-model code
+### 1) Project that depends on `openghg` (and `openghg_inversions`)
 
 Use this pattern when you expect code to outgrow a single notebook and want reusable, testable modules.
 
@@ -67,14 +108,15 @@ Use this pattern when you expect code to outgrow a single notebook and want reus
 
 **Example usage**
 
+``` python
     from my_project.inversion.model import run_inversion
     from my_project.io.loaders import load_inputs
 
     inputs = load_inputs(...)
     result = run_inversion(inputs)
+```
 
 This keeps logic reusable and makes it easier to move stable code into openghg or openghg_inversions.
-
 
 
 ### 2) Experiment-driven notebooks with gradual extraction to `src/`
@@ -159,9 +201,11 @@ Create a kernel from the project environment:
 
 Then select it in Jupyter.
 
+Pros:
+- Can be used from any Jupyter Lab instance
 
 
-### Auto-reload during development
+### Auto-reload during development (important for options B and C)
 
 To automatically reload code changes:
 
