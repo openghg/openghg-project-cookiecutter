@@ -15,7 +15,7 @@ dependencies = [
   "distributed",
   "dask-jobqueue",
   "openghg",
-  "openghg_inversions @ git+https://github.com/openghg/openghg_inversions.git",
+  "openghg_inversions",
 ]
 
 [project.optional-dependencies]
