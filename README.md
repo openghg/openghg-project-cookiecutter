@@ -54,13 +54,14 @@ python -m pip install cookiecutter
 cookiecutter /path/to/openghg-cookiecutter-template
 ```
 
-## Quickstart for notebooks
+## Quickstart
 
-From inside your project create an environment and install an ipython kernel:
+### Environment and kernel setup
 
-``` bash
+From inside your project:
+
+```bash
 uv sync
-uv pip install -e .
 
 uv run python -m ipykernel install \
   --user \
@@ -68,16 +69,75 @@ uv run python -m ipykernel install \
   --display-name "Python (my-project)"
 ```
 
+`uv sync` installs dependencies and makes your package importable in the
+project environment.
+
 Then use your code (in the `src` directory) in a notebook with:
 
-``` jupyter-notebook
+```python
 %load_ext autoreload
 %autoreload 2
 
 from my_project.flux import compute_flux
 ```
 
-See below for more details.
+### Git + GitHub setup
+
+#### Initialise git and push to GitHub (with gh CLI)
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+
+gh repo create openghg/<repo_name> \
+  --source=. \
+  --remote=origin \
+  --push
+```
+
+Use a different org (or omit the org prefix) if you want a non-OpenGHG target.
+
+#### Fallback if GitHub CLI is not installed
+
+If you do not have `gh` installed:
+
+1. Go to https://github.com/new
+2. Create a repository with the same name
+3. Then run:
+
+```bash
+git remote add origin git@github.com:<USER_OR_ORG>/<repo_name>.git
+git branch -M main
+git push -u origin main
+```
+
+## Development workflow
+
+- Put reusable code in `src/<package_name>/`
+- Import it in notebooks
+- Avoid copying code between notebooks
+
+```python
+from my_project.flux import compute_flux
+```
+
+## What to commit (and what not to)
+
+Commit:
+- `src/`
+- `notebooks/`
+- `pyproject.toml`
+- `README.md`
+
+Do NOT commit:
+- `data/`
+- `*.nc`
+- `*.zarr`
+- `.ipynb_checkpoints/`
+
+`.gitignore` already handles this.
 
 ## Examples
 
@@ -146,7 +206,31 @@ This is the typical workflow:
 
 There are three common approaches.
 
-**Option A: bootstrap (recommended default)**
+**Option A: editable install (preferred)**
+
+With `uv`, use:
+
+    uv sync
+
+or:
+
+    pip install -e .
+
+Use `pip install -e .` as a fallback for non-`uv` environments.
+
+Then import normally:
+
+    from my_project.flux import compute_flux
+
+Pros:
+- Clean imports
+- Closer to real package usage
+
+
+
+**Option B: bootstrap (fallback for HPC / existing kernels)**
+
+The preferred approach is to use `uv sync` (editable install) with autoreload.
 
 Add this near the top of the notebook:
 
@@ -170,26 +254,6 @@ Pros:
 
 
 
-**Option B: editable install**
-
-Install the package into the current environment:
-
-    uv pip install -e .
-
-or:
-
-    pip install -e .
-
-Then import normally:
-
-    from my_project.flux import compute_flux
-
-Pros:
-- Clean imports
-- Closer to real package usage
-
-
-
 **Option C: dedicated kernel**
 
 Create a kernel from the project environment:
@@ -206,6 +270,8 @@ Pros:
 
 
 ### Auto-reload during development (important for options B and C)
+
+This is recommended when using editable installs or a dedicated kernel.
 
 To automatically reload code changes:
 
@@ -241,3 +307,28 @@ Useful for quick iteration, but:
 5. Restart kernel when behaviour becomes unclear
 
 This keeps notebooks flexible while building a reusable codebase.
+
+## Appendix: Installing GitHub CLI (gh) on Rocky Linux
+
+```bash
+mkdir -p ~/bin
+cd ~/bin
+
+curl -L https://github.com/cli/cli/releases/download/vX.Y.Z/gh_X.Y.Z_linux_amd64.tar.gz | tar xz
+cp gh_X.Y.Z_linux_amd64/bin/gh ~/bin/
+
+export PATH="$HOME/bin:$PATH"
+
+gh auth login
+```
+
+Replace `X.Y.Z` with the version you want to install. Add the `PATH` export to
+your shell config (for example `~/.bashrc`) to make it persistent.
+
+For shared setup instructions (uv, gh, HPC workflows), consider maintaining a
+separate repository such as:
+
+    openghg-tools
+
+TODO (@brendan-m-murphy): decide whether to create and maintain `openghg-tools`
+as the shared setup repository.
